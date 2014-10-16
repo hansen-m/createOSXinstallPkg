@@ -761,6 +761,10 @@ def main():
         '--make-dmg', action='store_true', help='Optional. '
         'Instead of creating an installer pkg, creates a disk image for use '
         'with VMware Fusion to install a customized OS X. Experimental.')
+    parser.add_option(
+        '--manual-install', action='store_true', help='Optional. '
+        'Used with the --make-dmg option, causes the OS X installer to run '
+        'in a manual mode, allows access to utilities and package selection.')
     options, arguments = parser.parse_args()
 
     if arguments:
@@ -871,7 +875,7 @@ def main():
 
     # Figure out where we will be writing this...
     custom_tag = ''
-    additional_packages = options.packages or plist_options.get('Packages')
+    additional_packages = options.packages or plist_options.get('Packages') or []
 
     if additional_packages:
         custom_tag = '_custom'
@@ -966,7 +970,7 @@ def main():
 
     if additional_packages or options.make_dmg:
         create_minstallconfig = False
-        if options.make_dmg:
+        if options.make_dmg and not options.manual_install:
             create_minstallconfig = True
         try:
             addPackagesToInstallESD(
